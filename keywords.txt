@@ -1,0 +1,9 @@
+# Methods and Functions
+setup	KEYWORD2
+setTimeout	KEYWORD2
+setInterval	KEYWORD2
+cancel	KEYWORD2
+handle	KEYWORD2
+
+# Type names
+AsyncTimer	KEYWORD1	DATA_TYPE
