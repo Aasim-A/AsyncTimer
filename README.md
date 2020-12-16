@@ -1,24 +1,41 @@
 # AsyncTimer
-JavaScript like Async timing functions (setTimeout, setInterval)
 
-## Installing
+[![arduino-library-badge](https://www.ardu-badge.com/badge/AsyncTimer.svg?)](https://www.ardu-badge.com/AsyncTimer)
+[![GitHub release](https://img.shields.io/github/release/Aasim-A/AsyncTimer.svg)](https://github.com/Aasim-A/AsyncTimer/releases)
+[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/Aasim-A/AsyncTimer/blob/master/LICENSE)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](#Contributing)
+[![GitHub issues](https://img.shields.io/github/issues/Aasim-A/AsyncTimer.svg)](http://github.com/Aasim-A/AsyncTimer/issues)
 
-#### Aduino IDE:
+### JavaScript-like Async timing functions (setTimeout, setInterval)
+
+# Installing
+
+## Aduino IDE:
+
+#### Library Manager:
+
+The easiest way is to install it through Arduino Library manager selecting the menu:
+```
+Sketch -> Include Library -> Manage Libraries
+```
+Then type `AsyncTimer` into the search box and install the latest version.
+
+#### Manual install:
 
 Download the repository as .zip and include it as a new library into the IDE selecting the menu:
 
 ```
- Sketch -> include Library -> Add .Zip library
+ Sketch -> Include Library -> Add .Zip library
 ```
 
-#### platformIO:
+## PlatformIO:
 
-Go to libraries and type `AsyncTimer` into the search bar and add it to your project.
+Go to libraries and type [AsyncTimer](https://platformio.org/lib/show/11569/AsyncTimer) into the search bar and add it to your project.
 
-## Getting Started
+# Getting Started
 Simply include the library into your sketch and make one instance of `AsyncTimer` and add the setup function to `void setup()` and the handler to `void loop()` and then start using it!
 
-## Example:
+#### Example:
 
 ```c++
 #include <AsyncTimer.h>
@@ -149,4 +166,8 @@ t.cancel(timeoutId);
 
 # License
 
-This library is licensed under `MIT license`.
+This library is licensed under [MIT](https://github.com/Aasim-A/AsyncTimer/blob/master/LICENSE).
+
+# Copyright
+
+Copyright 2020 - Aasim-A
