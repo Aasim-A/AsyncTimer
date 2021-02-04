@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2020 Aasim-A
+  Copyright (c) 2021 Aasim-A
   Respository: https://github.com/Aasim-A/AsyncTimer
 
   Permission is hereby granted, free of charge, to any person obtaining a copy

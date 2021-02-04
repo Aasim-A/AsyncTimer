@@ -6,7 +6,7 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](#Contributing)
 [![GitHub issues](https://img.shields.io/github/issues/Aasim-A/AsyncTimer.svg)](http://github.com/Aasim-A/AsyncTimer/issues)
 
-### JavaScript-like Async timing functions (setTimeout, setInterval)
+### JavaScript-like Async timing functions (setTimeout, setInterval) for Arduino, ESP8266, ESP32 and other compatible boards
 
 # Installing
 
@@ -170,4 +170,4 @@ This library is licensed under [MIT](https://github.com/Aasim-A/AsyncTimer/blob/
 
 # Copyright
 
-Copyright 2020 - Aasim-A
+Copyright 2021 - Aasim-A
