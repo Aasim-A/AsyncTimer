@@ -25,6 +25,7 @@
 #define ASYNC_TIMER_H
 
 #include <Arduino.h>
+#include <functional>
 #include <map>
 
 class AsyncTimer {
