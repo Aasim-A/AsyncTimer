@@ -25,7 +25,9 @@
 #define ASYNC_TIMER_H
 
 #include <Arduino.h>
+#ifdef ESP32
 #include <functional>
+#endif
 #include <map>
 
 class AsyncTimer {
