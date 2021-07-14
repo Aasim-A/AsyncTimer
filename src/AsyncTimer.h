@@ -20,39 +20,52 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-
 #ifndef ASYNC_TIMER_H
 #define ASYNC_TIMER_H
 
 #include <Arduino.h>
-#ifdef ESP32
-#include <functional>
-#endif
-#include <map>
 
 class AsyncTimer {
 private:
   struct m_TimerInfo {
-    std::function<void()> callback;
-    unsigned long delayByMs;
+    unsigned short id;
+    void (*callback)();
+    unsigned int delayByMs;
     unsigned long timestamp;
     bool indefinite;
-    bool cancel;
+    bool active;
 
-    m_TimerInfo(std::function<void()> callback, unsigned long ms,
-                unsigned long timestamp, bool indefinite)
-        : callback(callback), delayByMs(ms), timestamp(timestamp),
-          indefinite(indefinite), cancel(false) {}
+    m_TimerInfo() : active(false) {}
   };
 
-  std::map<unsigned short, m_TimerInfo> m_callsMap;
-  std::vector<unsigned short> m_callsToRemove;
+  unsigned short m_newTimerInfo(void (*callback)(), unsigned int ms,
+                                bool indefinite);
+
+  unsigned short m_maxArrayLength;
+  unsigned short m_arrayLength = 0;
+  m_TimerInfo *m_callsArray;
+  unsigned short m_availableIndecesLength;
+  unsigned short *m_availableIndeces;
 
 public:
-  AsyncTimer() { m_callsToRemove.reserve(10); }
+  AsyncTimer(unsigned short arrayLength = 10) {
+    m_maxArrayLength = arrayLength;
+    m_callsArray = new m_TimerInfo[arrayLength];
+    m_availableIndecesLength = arrayLength;
+    m_availableIndeces = new unsigned short[arrayLength];
+    for (short i = 0; i < m_availableIndecesLength; i++)
+      m_availableIndeces[i] = i;
+  }
+  ~AsyncTimer() {
+    delete[] m_callsArray;
+    delete[] m_availableIndeces;
+  }
   void setup();
-  unsigned short setTimeout(std::function<void()> callback, unsigned long ms);
-  unsigned short setInterval(std::function<void()> callback, unsigned long ms);
+  unsigned short setTimeout(void (*callback)(), unsigned int ms);
+  unsigned short setInterval(void (*callback)(), unsigned int ms);
+  void changeDelay(unsigned short id, unsigned int ms);
+  void delay(unsigned short id, unsigned int ms);
+  void reset(unsigned short id);
   void cancel(unsigned short id);
   void handle();
 };

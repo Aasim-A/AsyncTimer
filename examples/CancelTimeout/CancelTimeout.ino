@@ -4,25 +4,18 @@
 
 AsyncTimer t;
 
-void setup()
-{
+void setup() {
   t.setup();
   Serial.begin(9600);
 
-  unsigned short timeoutId = t.setTimeout([&]() {
-      Serial.println("Message after 10 seconds from booting");
-    }, 10000);
+  unsigned short timeoutId = t.setTimeout(
+      []() { Serial.println("Message after 10 seconds from booting"); }, 10000);
 
   // Cancel instantly:
   // t.cancel(timeoutId);
 
   // Or cancel using another timeout after 3 seconds:
-  t.setTimeout([&]() {
-      t.cancel(timeoutId);
-    }, 3000);
+  t.setTimeout([]() { t.cancel(timeoutId); }, 3000);
 }
 
-void loop()
-{
-  t.handle();
-}
+void loop() { t.handle(); }

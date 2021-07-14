@@ -1,53 +1,83 @@
 #include "AsyncTimer.h"
 
-void AsyncTimer::setup() { srand((unsigned)time(0)); }
+void AsyncTimer::setup() { srand(millis()); }
 
-unsigned short AsyncTimer::setTimeout(std::function<void()> callback,
-                                      unsigned long ms) {
-  unsigned short id = rand();
-  m_TimerInfo timerInfo(callback, ms, millis(), false);
-  m_callsMap.insert(std::make_pair(id, timerInfo));
+unsigned short AsyncTimer::m_newTimerInfo(void (*callback)(), unsigned int ms,
+                                          bool indefinite) {
+  if (m_availableIndecesLength == 0 || m_arrayLength == m_maxArrayLength) {
+    return 0;
+  }
+  unsigned short id = rand() + 1;
+  m_availableIndecesLength--;
+  unsigned short availableIndex = m_availableIndeces[m_availableIndecesLength];
+  m_callsArray[availableIndex].id = id;
+  m_callsArray[availableIndex].callback = callback;
+  m_callsArray[availableIndex].delayByMs = ms;
+  m_callsArray[availableIndex].timestamp = millis();
+  m_callsArray[availableIndex].indefinite = indefinite;
+  m_callsArray[availableIndex].active = true;
+  m_arrayLength++;
+
   return id;
 }
 
-unsigned short AsyncTimer::setInterval(std::function<void()> callback,
-                                       unsigned long ms) {
-  unsigned short id = rand();
-  m_TimerInfo timerInfo(callback, ms, millis(), true);
-  m_callsMap.insert(std::make_pair(id, timerInfo));
-  return id;
+unsigned short AsyncTimer::setTimeout(void (*callback)(), unsigned int ms) {
+  return m_newTimerInfo(callback, ms, false);
+}
+
+unsigned short AsyncTimer::setInterval(void (*callback)(), unsigned int ms) {
+  return m_newTimerInfo(callback, ms, true);
+}
+
+void AsyncTimer::changeDelay(unsigned short id, unsigned int ms) {
+  for (short i = 0; i < m_maxArrayLength; i++)
+    if (m_callsArray[i].id == id)
+      m_callsArray[i].delayByMs = ms;
+}
+
+void AsyncTimer::delay(unsigned short id, unsigned int ms) {
+  for (short i = 0; i < m_maxArrayLength; i++)
+    if (m_callsArray[i].id == id)
+      m_callsArray[i].timestamp += ms;
+}
+
+void AsyncTimer::reset(unsigned short id) {
+  for (short i = 0; i < m_maxArrayLength; i++)
+    if (m_callsArray[i].id == id)
+      m_callsArray[i].timestamp = millis();
 }
 
 void AsyncTimer::cancel(unsigned short id) {
-  auto it = m_callsMap.find(id);
-  if (it != m_callsMap.end()) {
-    it->second.cancel = true;
+  for (short i = 0; i < m_maxArrayLength; i++) {
+    if (m_callsArray[i].id == id) {
+      m_callsArray[i].active = false;
+      m_arrayLength--;
+      m_availableIndeces[m_availableIndecesLength] = i;
+      m_availableIndecesLength++;
+    }
   }
 }
 
 void AsyncTimer::handle() {
-  if (m_callsMap.empty())
+  if (m_arrayLength == 0)
     return;
 
-  for (auto &it : m_callsMap) {
-    if (it.second.cancel) {
-      m_callsToRemove.push_back(it.first);
+  for (short i = 0; i < m_maxArrayLength; i++) {
+    unsigned long timestamp = millis();
+    if (!m_callsArray[i].active || m_callsArray[i].timestamp > timestamp)
       continue;
+    if (timestamp - m_callsArray[i].timestamp >= m_callsArray[i].delayByMs) {
+      if (m_callsArray[i].indefinite) {
+        m_callsArray[i].timestamp = timestamp;
+        m_callsArray[i].callback();
+      } else {
+        m_callsArray[i].callback();
+        m_callsArray[i].active = false;
+        m_callsArray[i].callback = nullptr;
+        m_arrayLength--;
+        m_availableIndeces[m_availableIndecesLength] = i;
+        m_availableIndecesLength++;
+      }
     }
-
-    if (millis() - it.second.timestamp > it.second.delayByMs) {
-      it.second.callback();
-      if (it.second.indefinite) {
-        it.second.timestamp = millis();
-      } else
-        m_callsToRemove.push_back(it.first);
-    }
-  }
-
-  if (!m_callsToRemove.empty()) {
-    for (const unsigned short &id : m_callsToRemove) {
-      m_callsMap.erase(id);
-    }
-    m_callsToRemove.clear();
   }
 }

@@ -2,6 +2,9 @@
 setup	KEYWORD2
 setTimeout	KEYWORD2
 setInterval	KEYWORD2
+changeDelay	KEYWORD2
+delay	KEYWORD2
+reset	KEYWORD2
 cancel	KEYWORD2
 handle	KEYWORD2
 

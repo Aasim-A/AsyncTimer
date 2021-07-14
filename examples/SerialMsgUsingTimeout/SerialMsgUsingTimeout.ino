@@ -4,17 +4,12 @@
 
 AsyncTimer t;
 
-void setup()
-{
+void setup() {
   t.setup();
   Serial.begin(9600);
 
-  t.setTimeout([&]() {
-      Serial.println("Message after 10 seconds from booting");
-    }, 10000);
+  t.setTimeout(
+      []() { Serial.println("Message after 10 seconds from booting"); }, 10000);
 }
 
-void loop()
-{
-  t.handle();
-}
+void loop() { t.handle(); }

@@ -32,8 +32,10 @@ Download the repository as .zip and include it as a new library into the IDE sel
 
 Go to libraries and type [AsyncTimer](https://platformio.org/lib/show/11569/AsyncTimer) into the search bar and add it to your project.
 
+
 # Getting Started
 Simply include the library into your sketch and make one instance of `AsyncTimer` and add the setup function to `void setup()` and the handler to `void loop()` and then start using it!
+
 
 #### Example:
 
@@ -53,13 +55,19 @@ void loop()
 }
 ```
 
-### NOTE: only one instance must be created and it must be outside any function, as shown in the example above.
+> ⚠NOTE⚠: only one instance must be created and it must be outside any function, as shown in the example above.
+
+> ⚠NOTE⚠: The default timer capacity is 10, if you wish to increase it, you have to use non-default initializer:
+
+```c++
+AsyncTimer t = AsyncTimer(22);
+```
 
 # API
 
 ## setTimeout(callbackFunction, delayInMs)
 
-`setTimeout` takes two arguments, the first one is the function to call after waiting, the second one is the time in milliseconds to wait before executing the function. It returns an `unsigned short` id of the timeout.
+`setTimeout` takes two arguments, the first one is the function to call after waiting, the second one is the time in milliseconds to wait before executing the function. It returns an `unsigned short` id of the timeout. If the `timeout` creation was unseccussfull, it returns `0`.
 It will run only once unless canceled.
 
 #### Example:
@@ -69,7 +77,7 @@ It will run only once unless canceled.
 ```c++
 AsyncTimer t;
 
-t.setTimeout([&]() {
+t.setTimeout([]() {
   Serial.println("Hello world!");
 }, 2000);
 // "Hello world!" will be printed to the Serial once after 2 seconds
@@ -91,7 +99,7 @@ t.setTimeout(functionToCall, 2000);
 
 ## setInterval(callbackFunction, delayInMs)
 
-`setInterval` takes the same parameters as `setTimeout` and returns an `unsigned short` id of the interval, unlike `setTimeout`, it will keep executing the code forever unless canceled.
+`setInterval` takes the same parameters as `setTimeout` and returns an `unsigned short` id of the interval, unlike `setTimeout`, it will keep executing the code forever unless canceled. If the `interval` creation was unseccussfull, it returns `0`.
 
 #### Example:
 
@@ -100,7 +108,7 @@ t.setTimeout(functionToCall, 2000);
 ```c++
 AsyncTimer t;
 
-t.setInterval([&]() {
+t.setInterval([]() {
   Serial.println("Hello world!");
 }, 2000);
 // "Hello world!" will be printed to the Serial every 2 seconds
@@ -120,9 +128,77 @@ t.setInterval(functionToCall, 2000);
 // "Hello world!" will be printed to the Serial every 2 seconds
 ```
 
+## changeDelay(intervalOrTimeoutId, delayInMs)
+Changes the delay value of an active `intervalOrTimeout`.
+
+`changeDelay` takes two arguments, the `id` returned from `setTimeout` or `setInterval` function and the new `delayValue` in `ms`, returns `void`.
+
+#### Example:
+
+- Changing the delay of `setInterval`:
+
+```c++
+AsyncTimer t;
+
+unsigned short intervalId = t.setInterval([]() {
+  Serial.println("Hello world!");
+}, 2000);
+
+t.setTimeout([]() {
+  t.changeDelay(intervalId, 3500);
+  // Now the interval runs every 3500ms instead of the old 2000ms
+}, 7000);
+```
+
+## delay(intervalOrTimeoutId, delayInMs)
+Delays the execution of an active `intervalOrTimeout`.
+
+`delay` takes two arguments, the `id` returned from `setTimeout` or `setInterval` function and the new `delayValue` in `ms`, returns `void`.
+
+#### Example:
+
+- Delaying the execution of `setInterval`:
+
+```c++
+AsyncTimer t;
+
+unsigned short intervalId = t.setInterval([]() {
+  Serial.println("Hello world!");
+}, 2000);
+
+t.setTimeout([]() {
+  t.delay(intervalId, 3500);
+  // Now the interval will be delayed by an extra 3500ms,
+  // afterwords, it will continue executing normally.
+}, 7000);
+```
+
+## reset(intervalOrTimeoutId)
+Resets the wait time of an active `intervalOrTimeout`.
+
+`delay` takes one argument, the `id` returned from `setTimeout` or `setInterval` function, returns `void`.
+
+#### Example:
+
+- Resetting the wait time of `setInterval`:
+
+```c++
+AsyncTimer t;
+
+unsigned short intervalId = t.setInterval([]() {
+  Serial.println("Hello world!");
+}, 2000);
+
+t.setTimeout([]() {
+  t.reset(intervalId);
+  // Now the interval will be reset, this means that it will
+  // execute exactly 2000ms after the reset function call.
+}, 7000);
+```
+
 ## cancel(intervalOrTimeoutId)
 
-It cancels the execution of a timeout or an interval.
+Cancels the execution of a timeout or an interval.
 
 `cancel` takes one argument, the `id` returned from `setTimeout` or `setInterval` function and returns `void`.
 
@@ -133,12 +209,12 @@ It cancels the execution of a timeout or an interval.
 ```c++
 AsyncTimer t;
 
-unsigned short intervalId = t.setInterval([&]() {
+unsigned short intervalId = t.setInterval([]() {
   Serial.println("Hello world!");
 }, 2000);
 
 // Cancel the interval after 7 seconds:
-t.setTimeout([&]() {
+t.setTimeout([]() {
   t.cancel(intervalId);
 }, 7000);
 ```
@@ -149,7 +225,7 @@ t.setTimeout([&]() {
 AsyncTimer t;
 
 // This timeout will never run
-unsigned short timeoutId = t.setTimeout([&]() {
+unsigned short timeoutId = t.setTimeout([]() {
   Serial.println("Hello world!");
 }, 3000);
 
@@ -157,12 +233,16 @@ unsigned short timeoutId = t.setTimeout([&]() {
 t.cancel(timeoutId);
 ```
 
+# Limitations
+- Capturing lambda functions do not work.
+
 # Examples
 
 - BlinkUsingInterval - Blink led using `setInterval`.
 - SerialMsgUsingTimeout - Send a message to the serial monitor using `setTimeout` 10 seconds after booting.
 - CancelInterval - Cancel an interval using `cancel`.
 - CancelTimeout - Cancel a timeout using `cancel`.
+- DebounceUsingTimeout - Debounce button using a `delay`.
 
 # License
 
