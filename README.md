@@ -60,7 +60,7 @@ void loop()
 > ⚠NOTE⚠: The default timer capacity is 10, if you wish to increase it, you have to use non-default initializer:
 
 ```c++
-AsyncTimer t = AsyncTimer(22);
+AsyncTimer t(22);
 ```
 
 # API
