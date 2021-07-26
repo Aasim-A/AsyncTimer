@@ -10,7 +10,7 @@
 
 # Installing
 
-## Aduino IDE:
+## Arduino IDE:
 
 #### Library Manager:
 
@@ -67,7 +67,7 @@ AsyncTimer t(22);
 
 ## setTimeout(callbackFunction, delayInMs)
 
-`setTimeout` takes two arguments, the first one is the function to call after waiting, the second one is the time in milliseconds to wait before executing the function. It returns an `unsigned short` id of the timeout. If the `timeout` creation was unseccussfull, it returns `0`.
+`setTimeout` takes two arguments, the first one is the function to call after waiting, the second one is the time in milliseconds to wait before executing the function. It returns an `unsigned short` id of the timeout, you can also access the `id` via the passed argument to the callback function. If the `timeout` creation was unsuccessful, it returns `0`.
 It will run only once unless canceled.
 
 #### Example:
@@ -77,10 +77,17 @@ It will run only once unless canceled.
 ```c++
 AsyncTimer t;
 
-t.setTimeout([]() {
+unsigned short id = t.setTimeout([]() {
   Serial.println("Hello world!");
 }, 2000);
 // "Hello world!" will be printed to the Serial once after 2 seconds
+
+t.setTimeout([](unsigned short id) {
+  // You can access the same id within the callback function via id argument.
+  // This is useful when using an id within a nested timeout or interval inside
+  // another since capturing lambda functions are not supported.
+  Serial.println("Hello world!");
+}, 2000);
 ```
 
 - Using normal function:
@@ -93,13 +100,23 @@ void functionToCall()
   Serial.println("Hello world!");
 }
 
-t.setTimeout(functionToCall, 2000);
+unsigned short id = t.setTimeout(functionToCall, 2000);
 // "Hello world!" will be printed to the Serial once after 2 seconds
+
+void functionToCall(unsigned short id)
+{
+  // You can access the same id within the callback function via id argument.
+  // This is useful when using an id within a nested timeout or interval inside
+  // another since capturing lambda functions are not supported.
+  Serial.println("Hello world!");
+}
+
+t.setTimeout(functionToCall, 2000);
 ```
 
 ## setInterval(callbackFunction, delayInMs)
 
-`setInterval` takes the same parameters as `setTimeout` and returns an `unsigned short` id of the interval, unlike `setTimeout`, it will keep executing the code forever unless canceled. If the `interval` creation was unseccussfull, it returns `0`.
+`setInterval` takes the same parameters as `setTimeout` and returns an `unsigned short` id of the interval, you can also access the `id` via the passed argument to the callback function, unlike `setTimeout`, it will keep executing the code forever unless canceled. If the `interval` creation was unsuccessful, it returns `0`.
 
 #### Example:
 
@@ -112,6 +129,13 @@ t.setInterval([]() {
   Serial.println("Hello world!");
 }, 2000);
 // "Hello world!" will be printed to the Serial every 2 seconds
+
+t.setInterval([](unsigned short id) {
+  // You can access the same id within the callback function via id argument.
+  // This is useful when using an id within a nested timeout or interval inside
+  // another since capturing lambda functions are not supported.
+  Serial.println("Hello world!");
+}, 2000);
 ```
 
 - Using normal function:
@@ -124,8 +148,18 @@ void functionToCall()
   Serial.println("Hello world!");
 }
 
-t.setInterval(functionToCall, 2000);
+unsigned short id = t.setInterval(functionToCall, 2000);
 // "Hello world!" will be printed to the Serial every 2 seconds
+
+void functionToCall(unsigned short id)
+{
+  // You can access the same id within the callback function via id argument.
+  // This is useful when using an id within a nested timeout or interval inside
+  // another since capturing lambda functions are not supported.
+  Serial.println("Hello world!");
+}
+
+t.setInterval(functionToCall, 2000);
 ```
 
 ## changeDelay(intervalOrTimeoutId, delayInMs)
