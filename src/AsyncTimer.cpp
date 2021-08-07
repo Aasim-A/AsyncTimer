@@ -4,12 +4,12 @@ void AsyncTimer::setup() { srand(millis()); }
 
 unsigned short AsyncTimer::m_newTimerInfo(void (*callback)(), unsigned int ms,
                                           bool indefinite) {
-  if (m_availableIndecesLength == 0 || m_arrayLength == m_maxArrayLength) {
+  if (m_availableIndicesLength == 0 || m_arrayLength == m_maxArrayLength) {
     return 0;
   }
   unsigned short id = rand() + 1;
-  m_availableIndecesLength--;
-  unsigned short availableIndex = m_availableIndeces[m_availableIndecesLength];
+  m_availableIndicesLength--;
+  unsigned short availableIndex = m_availableIndices[m_availableIndicesLength];
   m_callsArray[availableIndex].id = id;
   m_callsArray[availableIndex].callback = callback;
   m_callsArray[availableIndex].delayByMs = ms;
@@ -52,8 +52,8 @@ void AsyncTimer::cancel(unsigned short id) {
     if (m_callsArray[i].id == id) {
       m_callsArray[i].active = false;
       m_arrayLength--;
-      m_availableIndeces[m_availableIndecesLength] = i;
-      m_availableIndecesLength++;
+      m_availableIndices[m_availableIndicesLength] = i;
+      m_availableIndicesLength++;
     }
   }
 }
@@ -75,8 +75,8 @@ void AsyncTimer::handle() {
         m_callsArray[i].active = false;
         m_callsArray[i].callback = nullptr;
         m_arrayLength--;
-        m_availableIndeces[m_availableIndecesLength] = i;
-        m_availableIndecesLength++;
+        m_availableIndices[m_availableIndicesLength] = i;
+        m_availableIndicesLength++;
       }
     }
   }

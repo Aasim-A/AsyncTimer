@@ -44,21 +44,21 @@ private:
   unsigned short m_maxArrayLength;
   unsigned short m_arrayLength = 0;
   m_TimerInfo *m_callsArray;
-  unsigned short m_availableIndecesLength;
-  unsigned short *m_availableIndeces;
+  unsigned short m_availableIndicesLength;
+  unsigned short *m_availableIndices;
 
 public:
   AsyncTimer(unsigned short arrayLength = 10) {
     m_maxArrayLength = arrayLength;
     m_callsArray = new m_TimerInfo[arrayLength];
-    m_availableIndecesLength = arrayLength;
-    m_availableIndeces = new unsigned short[arrayLength];
-    for (short i = 0; i < m_availableIndecesLength; i++)
-      m_availableIndeces[i] = i;
+    m_availableIndicesLength = arrayLength;
+    m_availableIndices = new unsigned short[arrayLength];
+    for (short i = 0; i < m_availableIndicesLength; i++)
+      m_availableIndices[i] = i;
   }
   ~AsyncTimer() {
     delete[] m_callsArray;
-    delete[] m_availableIndeces;
+    delete[] m_availableIndices;
   }
   void setup();
   unsigned short setTimeout(void (*callback)(), unsigned int ms);
