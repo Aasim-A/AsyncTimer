@@ -2,7 +2,7 @@
 
 void AsyncTimer::setup() { srand(millis()); }
 
-unsigned short AsyncTimer::m_newTimerInfo(void (*callback)(), unsigned int ms,
+unsigned short AsyncTimer::m_newTimerInfo(void (*callback)(), unsigned long ms,
                                           bool indefinite) {
   if (m_availableIndicesLength == 0 || m_arrayLength == m_maxArrayLength) {
     return 0;
@@ -21,21 +21,21 @@ unsigned short AsyncTimer::m_newTimerInfo(void (*callback)(), unsigned int ms,
   return id;
 }
 
-unsigned short AsyncTimer::setTimeout(void (*callback)(), unsigned int ms) {
+unsigned short AsyncTimer::setTimeout(void (*callback)(), unsigned long ms) {
   return m_newTimerInfo(callback, ms, false);
 }
 
-unsigned short AsyncTimer::setInterval(void (*callback)(), unsigned int ms) {
+unsigned short AsyncTimer::setInterval(void (*callback)(), unsigned long ms) {
   return m_newTimerInfo(callback, ms, true);
 }
 
-void AsyncTimer::changeDelay(unsigned short id, unsigned int ms) {
+void AsyncTimer::changeDelay(unsigned short id, unsigned long ms) {
   for (short i = 0; i < m_maxArrayLength; i++)
     if (m_callsArray[i].id == id)
       m_callsArray[i].delayByMs = ms;
 }
 
-void AsyncTimer::delay(unsigned short id, unsigned int ms) {
+void AsyncTimer::delay(unsigned short id, unsigned long ms) {
   for (short i = 0; i < m_maxArrayLength; i++)
     if (m_callsArray[i].id == id)
       m_callsArray[i].timestamp += ms;
