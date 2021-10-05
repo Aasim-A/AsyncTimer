@@ -30,7 +30,7 @@ private:
   struct m_TimerInfo {
     unsigned short id;
     void (*callback)();
-    unsigned int delayByMs;
+    unsigned long delayByMs;
     unsigned long timestamp;
     bool indefinite;
     bool active;
@@ -38,7 +38,7 @@ private:
     m_TimerInfo() : active(false) {}
   };
 
-  unsigned short m_newTimerInfo(void (*callback)(), unsigned int ms,
+  unsigned short m_newTimerInfo(void (*callback)(), unsigned long ms,
                                 bool indefinite);
 
   unsigned short m_maxArrayLength;
@@ -61,10 +61,10 @@ public:
     delete[] m_availableIndices;
   }
   void setup();
-  unsigned short setTimeout(void (*callback)(), unsigned int ms);
-  unsigned short setInterval(void (*callback)(), unsigned int ms);
-  void changeDelay(unsigned short id, unsigned int ms);
-  void delay(unsigned short id, unsigned int ms);
+  unsigned short setTimeout(void (*callback)(), unsigned long ms);
+  unsigned short setInterval(void (*callback)(), unsigned long ms);
+  void changeDelay(unsigned short id, unsigned long ms);
+  void delay(unsigned short id, unsigned long ms);
   void reset(unsigned short id);
   void cancel(unsigned short id);
   void handle();
