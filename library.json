@@ -1,6 +1,6 @@
 {
   "name": "AsyncTimer",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "JavaScript-like async timing functions (setTimeout, setInterval).",
   "keywords": [
     "settimeout",
