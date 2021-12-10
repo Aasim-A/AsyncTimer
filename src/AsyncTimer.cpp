@@ -49,7 +49,7 @@ void AsyncTimer::reset(unsigned short id) {
 
 void AsyncTimer::cancel(unsigned short id) {
   for (short i = 0; i < m_maxArrayLength; i++) {
-    if (m_callsArray[i].id == id) {
+    if (m_callsArray[i].id == id && m_callsArray[i].active) {
       m_callsArray[i].active = false;
       m_arrayLength--;
       m_availableIndices[m_availableIndicesLength] = i;
