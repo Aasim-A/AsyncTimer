@@ -71,12 +71,13 @@ void AsyncTimer::handle() {
         m_callsArray[i].timestamp = timestamp;
         m_callsArray[i].callback();
       } else {
-        m_callsArray[i].callback();
+        void (*cb)() = m_callsArray[i].callback;
         m_callsArray[i].active = false;
         m_callsArray[i].callback = nullptr;
         m_arrayLength--;
         m_availableIndices[m_availableIndicesLength] = i;
         m_availableIndicesLength++;
+        cb();
       }
     }
   }
