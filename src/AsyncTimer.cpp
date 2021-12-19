@@ -30,25 +30,25 @@ unsigned short AsyncTimer::setInterval(void (*callback)(), unsigned long ms) {
 }
 
 void AsyncTimer::changeDelay(unsigned short id, unsigned long ms) {
-  for (short i = 0; i < m_maxArrayLength; i++)
+  for (unsigned short i = 0; i < m_maxArrayLength; i++)
     if (m_callsArray[i].id == id)
       m_callsArray[i].delayByMs = ms;
 }
 
 void AsyncTimer::delay(unsigned short id, unsigned long ms) {
-  for (short i = 0; i < m_maxArrayLength; i++)
+  for (unsigned short i = 0; i < m_maxArrayLength; i++)
     if (m_callsArray[i].id == id)
       m_callsArray[i].timestamp += ms;
 }
 
 void AsyncTimer::reset(unsigned short id) {
-  for (short i = 0; i < m_maxArrayLength; i++)
+  for (unsigned short i = 0; i < m_maxArrayLength; i++)
     if (m_callsArray[i].id == id)
       m_callsArray[i].timestamp = millis();
 }
 
 void AsyncTimer::cancel(unsigned short id) {
-  for (short i = 0; i < m_maxArrayLength; i++) {
+  for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     if (m_callsArray[i].id == id && m_callsArray[i].active) {
       m_callsArray[i].active = false;
       m_arrayLength--;
@@ -62,7 +62,7 @@ void AsyncTimer::handle() {
   if (m_arrayLength == 0)
     return;
 
-  for (short i = 0; i < m_maxArrayLength; i++) {
+  for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     unsigned long timestamp = millis();
     if (!m_callsArray[i].active || m_callsArray[i].timestamp > timestamp)
       continue;

@@ -53,7 +53,7 @@ public:
     m_callsArray = new m_TimerInfo[arrayLength];
     m_availableIndicesLength = arrayLength;
     m_availableIndices = new unsigned short[arrayLength];
-    for (short i = 0; i < m_availableIndicesLength; i++)
+    for (unsigned short i = 0; i < m_availableIndicesLength; i++)
       m_availableIndices[i] = i;
   }
   ~AsyncTimer() {
