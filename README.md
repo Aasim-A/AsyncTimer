@@ -34,7 +34,7 @@ Go to libraries and type [AsyncTimer](https://platformio.org/lib/show/11569/Asyn
 
 
 # Getting Started
-Simply include the library into your sketch and make one instance of `AsyncTimer` and add the setup function to `void setup()` and the handler to `void loop()` and then start using it!
+Simply include the library into your sketch and make one instance of `AsyncTimer` ~~and add the setup function to `void setup()`~~ and the handler to `void loop()` and then start using it!
 
 
 #### Example:
@@ -43,11 +43,6 @@ Simply include the library into your sketch and make one instance of `AsyncTimer
 #include <AsyncTimer.h>
 
 AsyncTimer t;
-
-void setup()
-{
-  t.setup();
-}
 
 void loop()
 {

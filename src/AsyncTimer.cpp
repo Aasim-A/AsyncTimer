@@ -1,13 +1,13 @@
 #include "AsyncTimer.h"
 
-void AsyncTimer::setup() { srand(millis()); }
+void AsyncTimer::setup() { }
 
 unsigned short AsyncTimer::m_newTimerInfo(void (*callback)(), unsigned long ms,
                                           bool indefinite) {
   if (m_availableIndicesLength == 0 || m_arrayLength == m_maxArrayLength) {
     return 0;
   }
-  unsigned short id = rand() + 1;
+  unsigned short id = ++m_nextId;
   m_availableIndicesLength--;
   unsigned short availableIndex = m_availableIndices[m_availableIndicesLength];
   m_callsArray[availableIndex].id = id;
