@@ -5,8 +5,6 @@
 AsyncTimer t;
 
 void setup() {
-  t.setup();
-
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
 

@@ -5,7 +5,6 @@
 AsyncTimer t;
 
 void setup() {
-  t.setup();
   Serial.begin(9600);
 
   unsigned short timeoutId = t.setTimeout(

@@ -7,7 +7,6 @@
 AsyncTimer t;
 
 void setup() {
-  t.setup();
   Serial.begin(9600);
 
   pinMode(BUTTON_PIN, INPUT);

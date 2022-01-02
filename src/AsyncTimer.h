@@ -43,6 +43,7 @@ private:
 
   unsigned short m_maxArrayLength;
   unsigned short m_arrayLength = 0;
+  unsigned long m_nextId = 0;
   m_TimerInfo *m_callsArray;
   unsigned short m_availableIndicesLength;
   unsigned short *m_availableIndices;
@@ -60,6 +61,7 @@ public:
     delete[] m_callsArray;
     delete[] m_availableIndices;
   }
+  [[deprecated("Not needed anymore, will be removed in future versions")]]
   void setup();
   unsigned short setTimeout(void (*callback)(), unsigned long ms);
   unsigned short setInterval(void (*callback)(), unsigned long ms);
