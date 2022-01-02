@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2021 Aasim-A
+  Copyright (c) 2022 Aasim-A
   Respository: https://github.com/Aasim-A/AsyncTimer
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -61,8 +61,8 @@ public:
     delete[] m_callsArray;
     delete[] m_availableIndices;
   }
-  [[deprecated("Not needed anymore, will be removed in future versions")]]
-  void setup();
+  [[deprecated("Not needed anymore, will be removed in future versions")]] void
+  setup();
   unsigned short setTimeout(void (*callback)(), unsigned long ms);
   unsigned short setInterval(void (*callback)(), unsigned long ms);
   void changeDelay(unsigned short id, unsigned long ms);

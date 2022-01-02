@@ -245,4 +245,4 @@ This library is licensed under [MIT](https://github.com/Aasim-A/AsyncTimer/blob/
 
 # Copyright
 
-Copyright 2021 - Aasim-A
+Copyright 2022 - Aasim-A
