@@ -1,13 +1,13 @@
 #include "AsyncTimer.h"
 
-void AsyncTimer::setup() { }
+void AsyncTimer::setup() {}
 
 unsigned short AsyncTimer::m_newTimerInfo(void (*callback)(), unsigned long ms,
                                           bool indefinite) {
   if (m_availableIndicesLength == 0 || m_arrayLength == m_maxArrayLength) {
     return 0;
   }
-  unsigned short id = ++m_nextId;
+  unsigned short id = rand() + 1;
   m_availableIndicesLength--;
   unsigned short availableIndex = m_availableIndices[m_availableIndicesLength];
   m_callsArray[availableIndex].id = id;
@@ -19,6 +19,14 @@ unsigned short AsyncTimer::m_newTimerInfo(void (*callback)(), unsigned long ms,
   m_arrayLength++;
 
   return id;
+}
+
+void AsyncTimer::m_cancelEntry(unsigned short index) {
+  m_callsArray[index].active = false;
+  m_callsArray[index].callback = nullptr;
+  m_arrayLength--;
+  m_availableIndices[m_availableIndicesLength] = index;
+  m_availableIndicesLength++;
 }
 
 unsigned short AsyncTimer::setTimeout(void (*callback)(), unsigned long ms) {
@@ -50,11 +58,18 @@ void AsyncTimer::reset(unsigned short id) {
 void AsyncTimer::cancel(unsigned short id) {
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     if (m_callsArray[i].id == id && m_callsArray[i].active) {
-      m_callsArray[i].active = false;
-      m_arrayLength--;
-      m_availableIndices[m_availableIndicesLength] = i;
-      m_availableIndicesLength++;
+      m_cancelEntry(i);
     }
+  }
+}
+
+void AsyncTimer::cancelAll(bool includeIntervals = true) {
+  for (unsigned short i = 0; i < m_maxArrayLength; i++) {
+    if (!includeIntervals) {
+      if (!m_callsArray[i].indefinite)
+        m_cancelEntry(i);
+    } else
+      m_cancelEntry(i);
   }
 }
 
@@ -72,11 +87,7 @@ void AsyncTimer::handle() {
         m_callsArray[i].callback();
       } else {
         void (*cb)() = m_callsArray[i].callback;
-        m_callsArray[i].active = false;
-        m_callsArray[i].callback = nullptr;
-        m_arrayLength--;
-        m_availableIndices[m_availableIndicesLength] = i;
-        m_availableIndicesLength++;
+        m_cancelEntry(i);
         cb();
       }
     }

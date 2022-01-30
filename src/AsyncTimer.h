@@ -43,10 +43,10 @@ private:
 
   unsigned short m_maxArrayLength;
   unsigned short m_arrayLength = 0;
-  unsigned long m_nextId = 0;
   m_TimerInfo *m_callsArray;
   unsigned short m_availableIndicesLength;
   unsigned short *m_availableIndices;
+  void m_cancelEntry(unsigned short index);
 
 public:
   AsyncTimer(unsigned short arrayLength = 10) {
@@ -69,6 +69,7 @@ public:
   void delay(unsigned short id, unsigned long ms);
   void reset(unsigned short id);
   void cancel(unsigned short id);
+  void cancelAll(bool includeIntervals = true);
   void handle();
 };
 
