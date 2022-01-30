@@ -228,6 +228,56 @@ unsigned short timeoutId = t.setTimeout([]() {
 t.cancel(timeoutId);
 ```
 
+## cancelAll(includeIntervals = true)
+
+Cancels the execution of a all timeouts and intervals or just timeouts.
+
+`cancelAll` takes one optional argument, if you intend to only cancel timeouts, then call the function with `false`, otherwise it clears both timeouts and intervals be default, returns `void`.
+
+#### Example:
+
+- Cancelling all timeouts and intervals:
+
+```c++
+AsyncTimer t;
+
+t.setInterval([]() {
+  Serial.println("foo");
+}, 2000);
+
+t.setTimeout([]() {
+  Serial.println("bar");
+}, 7000);
+
+t.setTimeout([]() {
+  Serial.println("baz");
+}, 7000);
+
+// After this call, nothing will be running inside AsyncTimer
+t.cancelAll();
+```
+
+- Only cancelling timeouts:
+
+```c++
+AsyncTimer t;
+
+t.setInterval([]() {
+  Serial.println("foo");
+}, 2000);
+
+t.setTimeout([]() {
+  Serial.println("bar");
+}, 7000);
+
+t.setTimeout([]() {
+  Serial.println("baz");
+}, 7000);
+
+// After this call, only intervals will be running inside AsyncTimer
+t.cancelAll(false);
+```
+
 # Limitations
 - Capturing lambda functions do not work.
 
