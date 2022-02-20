@@ -6,6 +6,7 @@ changeDelay	KEYWORD2
 delay	KEYWORD2
 reset	KEYWORD2
 cancel	KEYWORD2
+cancelAll	KEYWORD2
 handle	KEYWORD2
 
 # Type names

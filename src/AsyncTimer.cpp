@@ -63,7 +63,7 @@ void AsyncTimer::cancel(unsigned short id) {
   }
 }
 
-void AsyncTimer::cancelAll(bool includeIntervals = true) {
+void AsyncTimer::cancelAll(bool includeIntervals) {
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     if (!includeIntervals) {
       if (!m_callsArray[i].indefinite)
