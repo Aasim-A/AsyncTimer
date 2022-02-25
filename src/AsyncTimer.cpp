@@ -73,6 +73,14 @@ void AsyncTimer::cancelAll(bool includeIntervals) {
   }
 }
 
+unsigned long AsyncTimer::getRemaining(unsigned short id) {
+  unsigned long now = millis();
+  for (unsigned short i = 0; i < m_maxArrayLength; i++)
+    if (m_callsArray[i].id == id)
+      return m_callsArray[i].timestamp + m_callsArray[i].delayByMs - now;
+  return -1;
+}
+
 void AsyncTimer::handle() {
   if (m_arrayLength == 0)
     return;

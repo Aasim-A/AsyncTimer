@@ -278,6 +278,24 @@ t.setTimeout([]() {
 t.cancelAll(false);
 ```
 
+## getRemaining
+
+Gets the number of milliseconds remaining in a timer.  Returns -1 on timer not found.
+
+#### Example:
+
+```c++
+AsyncTimer t;
+
+// This timeout will never run
+unsigned short timeoutId = t.setTimeout([]() {
+  Serial.println("Hello world!");
+}, 3000);
+
+// Get the remaining ms on the timer
+unsigned long remaining = t.getRemaining(timeoutId);
+```
+
 # Limitations
 - Capturing lambda functions do not work.
 

@@ -70,6 +70,7 @@ public:
   void reset(unsigned short id);
   void cancel(unsigned short id);
   void cancelAll(bool includeIntervals = true);
+  unsigned long getRemaining(unsigned short id);
   void handle();
 };
 
