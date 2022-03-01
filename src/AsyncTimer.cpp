@@ -37,6 +37,22 @@ unsigned short AsyncTimer::setInterval(void (*callback)(), unsigned long ms) {
   return m_newTimerInfo(callback, ms, true);
 }
 
+unsigned long AsyncTimer::getRemaining(unsigned short id) {
+  unsigned long now = millis();
+  for (unsigned short i = 0; i < m_maxArrayLength; i++) {
+    if (m_callsArray[i].id == id) {
+      unsigned long tsDelay = m_callsArray[i].timestamp + m_callsArray[i].delayByMs;
+      // now can be bigger than timestamp + delayByMs because the code so far
+      // has beeen executing synchronously long enough that the library hasn't
+      // executed the callback yet
+      if (now > tsDelay)
+        return 0;
+      return tsDelay - now;
+    }
+  }
+  return 0;
+}
+
 void AsyncTimer::changeDelay(unsigned short id, unsigned long ms) {
   for (unsigned short i = 0; i < m_maxArrayLength; i++)
     if (m_callsArray[i].id == id)
@@ -71,14 +87,6 @@ void AsyncTimer::cancelAll(bool includeIntervals) {
     } else
       m_cancelEntry(i);
   }
-}
-
-unsigned long AsyncTimer::getRemaining(unsigned short id) {
-  unsigned long now = millis();
-  for (unsigned short i = 0; i < m_maxArrayLength; i++)
-    if (m_callsArray[i].id == id)
-      return m_callsArray[i].timestamp + m_callsArray[i].delayByMs - now;
-  return -1;
 }
 
 void AsyncTimer::handle() {

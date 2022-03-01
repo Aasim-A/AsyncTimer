@@ -123,6 +123,23 @@ t.setInterval(functionToCall, 2000);
 // "Hello world!" will be printed to the Serial every 2 seconds
 ```
 
+## getRemaining
+
+Gets the number of milliseconds remaining in a timer. Returns `0` on timer not found.
+
+#### Example:
+
+```c++
+AsyncTimer t;
+
+unsigned short timeoutId = t.setTimeout([]() {
+  Serial.println("Hello world!");
+}, 3000);
+
+// Get the remaining ms on the timer
+unsigned long remaining = t.getRemaining(timeoutId);
+```
+
 ## changeDelay(intervalOrTimeoutId, delayInMs)
 Changes the delay value of an active `intervalOrTimeout`.
 
@@ -276,24 +293,6 @@ t.setTimeout([]() {
 
 // After this call, only intervals will be running inside AsyncTimer
 t.cancelAll(false);
-```
-
-## getRemaining
-
-Gets the number of milliseconds remaining in a timer.  Returns -1 on timer not found.
-
-#### Example:
-
-```c++
-AsyncTimer t;
-
-// This timeout will never run
-unsigned short timeoutId = t.setTimeout([]() {
-  Serial.println("Hello world!");
-}, 3000);
-
-// Get the remaining ms on the timer
-unsigned long remaining = t.getRemaining(timeoutId);
 ```
 
 # Limitations
