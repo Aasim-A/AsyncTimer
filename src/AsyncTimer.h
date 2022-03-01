@@ -65,6 +65,7 @@ public:
   setup();
   unsigned short setTimeout(void (*callback)(), unsigned long ms);
   unsigned short setInterval(void (*callback)(), unsigned long ms);
+  unsigned long getRemaining(unsigned short id);
   void changeDelay(unsigned short id, unsigned long ms);
   void delay(unsigned short id, unsigned long ms);
   void reset(unsigned short id);
