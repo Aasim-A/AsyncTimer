@@ -123,9 +123,11 @@ t.setInterval(functionToCall, 2000);
 // "Hello world!" will be printed to the Serial every 2 seconds
 ```
 
-## getRemaining
+## getRemaining(intervalOrTimeoutId)
 
-Gets the number of milliseconds remaining in a timer. Returns `0` on timer not found.
+Gets the number of milliseconds remaining in a timer. Returns `0` if the timer is not found.
+
+`getRemaining` takes one argument, the `id` returned from `setTimeout` or `setInterval` function, returns `unsigned long`.
 
 #### Example:
 
