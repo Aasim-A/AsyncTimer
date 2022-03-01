@@ -2,12 +2,23 @@
 
 void AsyncTimer::setup() {}
 
+unsigned short AsyncTimer::m_generateId() {
+  unsigned short id = rand() + 1;
+
+  for (unsigned short i = 0; i < m_maxArrayLength; i++) {
+    if (m_callsArray[i].id == id)
+      return m_generateId();
+  }
+
+  return id;
+}
+
 unsigned short AsyncTimer::m_newTimerInfo(void (*callback)(), unsigned long ms,
                                           bool indefinite) {
-  if (m_availableIndicesLength == 0 || m_arrayLength == m_maxArrayLength) {
+  if (m_availableIndicesLength == 0 || m_arrayLength == m_maxArrayLength)
     return 0;
-  }
-  unsigned short id = rand() + 1;
+
+  unsigned short id = m_generateId();
   m_availableIndicesLength--;
   unsigned short availableIndex = m_availableIndices[m_availableIndicesLength];
   m_callsArray[availableIndex].id = id;
@@ -41,7 +52,8 @@ unsigned long AsyncTimer::getRemaining(unsigned short id) {
   unsigned long now = millis();
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     if (m_callsArray[i].id == id) {
-      unsigned long tsDelay = m_callsArray[i].timestamp + m_callsArray[i].delayByMs;
+      unsigned long tsDelay =
+          m_callsArray[i].timestamp + m_callsArray[i].delayByMs;
       // now can be bigger than timestamp + delayByMs because the code so far
       // has beeen executing synchronously
       if (now < tsDelay)
@@ -53,28 +65,30 @@ unsigned long AsyncTimer::getRemaining(unsigned short id) {
 }
 
 void AsyncTimer::changeDelay(unsigned short id, unsigned long ms) {
-  for (unsigned short i = 0; i < m_maxArrayLength; i++)
+  for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     if (m_callsArray[i].id == id)
       m_callsArray[i].delayByMs = ms;
+  }
 }
 
 void AsyncTimer::delay(unsigned short id, unsigned long ms) {
-  for (unsigned short i = 0; i < m_maxArrayLength; i++)
+  for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     if (m_callsArray[i].id == id)
       m_callsArray[i].timestamp += ms;
+  }
 }
 
 void AsyncTimer::reset(unsigned short id) {
-  for (unsigned short i = 0; i < m_maxArrayLength; i++)
+  for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     if (m_callsArray[i].id == id)
       m_callsArray[i].timestamp = millis();
+  }
 }
 
 void AsyncTimer::cancel(unsigned short id) {
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
-    if (m_callsArray[i].id == id && m_callsArray[i].active) {
+    if (m_callsArray[i].id == id && m_callsArray[i].active)
       m_cancelEntry(i);
-    }
   }
 }
 

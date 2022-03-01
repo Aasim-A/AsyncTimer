@@ -62,6 +62,8 @@ AsyncTimer t(22);
 
 ## setTimeout(callbackFunction, delayInMs)
 
+Creates a new timeout.
+
 `setTimeout` takes two arguments, the first one is the function to call after waiting, the second one is the time in milliseconds to wait before executing the function. It returns an `unsigned short` id of the timeout. If the `timeout` creation was unseccussfull, it returns `0`.
 It will run only once unless canceled.
 
@@ -93,6 +95,8 @@ t.setTimeout(functionToCall, 2000);
 ```
 
 ## setInterval(callbackFunction, delayInMs)
+
+Creates a new interval.
 
 `setInterval` takes the same parameters as `setTimeout` and returns an `unsigned short` id of the interval, unlike `setTimeout`, it will keep executing the code forever unless canceled. If the `interval` creation was unseccussfull, it returns `0`.
 

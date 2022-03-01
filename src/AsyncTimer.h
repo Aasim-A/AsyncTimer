@@ -38,6 +38,7 @@ private:
     m_TimerInfo() : active(false) {}
   };
 
+  unsigned short m_generateId();
   unsigned short m_newTimerInfo(void (*callback)(), unsigned long ms,
                                 bool indefinite);
 
