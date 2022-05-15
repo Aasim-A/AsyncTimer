@@ -133,12 +133,12 @@ public:
   setup();
   unsigned short setTimeout(Callback::FuncPtr func_ptr, unsigned long ms) {
     Callback func_ptr_cb(func_ptr);
-    _setTimeout(func_ptr_cb, ms);
+    return _setTimeout(func_ptr_cb, ms);
   };
   template <typename T>
   unsigned short setTimeout(T lambda, unsigned long ms) {
     Callback lambda_cb(lambda);
-    _setTimeout(lambda_cb, ms);
+    return _setTimeout(lambda_cb, ms);
   };
 
   unsigned short setInterval(Callback::FuncPtr func_ptr, unsigned long ms) {
