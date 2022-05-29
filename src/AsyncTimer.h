@@ -27,9 +27,74 @@
 
 class AsyncTimer {
 private:
+  class Callback {
+  public:
+    using FuncPtr = void(*)();
+
+    Callback() = default;
+    Callback(const Callback&) = delete;
+
+    Callback(FuncPtr funcPtr) :
+        m_isLambda(false), m_funcPtr(funcPtr) {}
+
+    template<typename T>
+    Callback(T lambda) : m_isLambda(true) {
+      m_lambda.data = new T(lambda);
+      m_lambda.execFunc = [](void *data) {
+        (*reinterpret_cast<T*>(data))();
+      };
+      m_lambda.deleteFunc = [](void* data) {
+        delete reinterpret_cast<T*>(data);
+      };
+    }
+
+    ~Callback() {
+      if (m_isLambda && m_lambda.data) {
+        m_lambda.deleteFunc(m_lambda.data);
+      }
+    }
+
+    void operator()() {
+      if (m_isLambda) {
+        return m_lambda.execFunc(m_lambda.data);
+      }
+      return m_funcPtr();
+    }
+
+    Callback& operator=(Callback& other) {
+      if (m_isLambda && m_lambda.data) {
+        m_lambda.deleteFunc(m_lambda.data);
+      }
+      m_isLambda = other.m_isLambda;
+      if (m_isLambda) {
+        m_lambda = other.m_lambda;
+        other.m_lambda.data = nullptr;
+      } else {
+        m_funcPtr = other.m_funcPtr;
+      }
+      return *this;
+    }
+
+  private:
+    using LambdaExecFunc = void(*)(void*);
+    using LambdaDeleteFunc = void(*)(void*);
+
+    struct LambdaStore {
+      void* data;
+      LambdaExecFunc execFunc;
+      LambdaDeleteFunc deleteFunc;
+    };
+
+    bool m_isLambda{false};
+    union {
+      LambdaStore m_lambda;
+      FuncPtr m_funcPtr;
+    };
+  };
+
   struct m_TimerInfo {
     unsigned short id;
-    void (*callback)();
+    Callback callback;
     unsigned long delayByMs;
     unsigned long timestamp;
     bool indefinite;
@@ -39,15 +104,17 @@ private:
   };
 
   unsigned short m_generateId();
-  unsigned short m_newTimerInfo(void (*callback)(), unsigned long ms,
+  unsigned short m_newTimerInfo(Callback& callback, unsigned long ms,
                                 bool indefinite);
+  void m_cancelEntry(unsigned short index);
+  unsigned short _setTimeout(Callback& callback, unsigned long ms);
+  unsigned short _setInterval(Callback& callback, unsigned long ms);
 
   unsigned short m_maxArrayLength;
   unsigned short m_arrayLength = 0;
   m_TimerInfo *m_callsArray;
   unsigned short m_availableIndicesLength;
   unsigned short *m_availableIndices;
-  void m_cancelEntry(unsigned short index);
 
 public:
   AsyncTimer(unsigned short arrayLength = 10) {
@@ -58,14 +125,37 @@ public:
     for (unsigned short i = 0; i < m_availableIndicesLength; i++)
       m_availableIndices[i] = i;
   }
+
   ~AsyncTimer() {
     delete[] m_callsArray;
     delete[] m_availableIndices;
   }
+
   [[deprecated("Not needed anymore, will be removed in future versions")]] void
   setup();
-  unsigned short setTimeout(void (*callback)(), unsigned long ms);
-  unsigned short setInterval(void (*callback)(), unsigned long ms);
+
+  unsigned short setTimeout(Callback::FuncPtr func_ptr, unsigned long ms) {
+    Callback func_ptr_cb(func_ptr);
+    return _setTimeout(func_ptr_cb, ms);
+  };
+
+  template <typename T>
+  unsigned short setTimeout(T lambda, unsigned long ms) {
+    Callback lambda_cb(lambda);
+    return _setTimeout(lambda_cb, ms);
+  };
+
+  unsigned short setInterval(Callback::FuncPtr func_ptr, unsigned long ms) {
+    Callback func_ptr_cb(func_ptr);
+    return _setInterval(func_ptr_cb, ms);
+  };
+
+  template <typename T>
+  unsigned short setInterval(T lambda, unsigned long ms) {
+    Callback lambda_cb(lambda);
+    return _setInterval(lambda_cb, ms);
+  };
+
   unsigned long getRemaining(unsigned short id);
   void changeDelay(unsigned short id, unsigned long ms);
   void delay(unsigned short id, unsigned long ms);
