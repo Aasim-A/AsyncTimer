@@ -106,15 +106,15 @@ private:
   unsigned short m_generateId();
   unsigned short m_newTimerInfo(Callback& callback, unsigned long ms,
                                 bool indefinite);
+  void m_cancelEntry(unsigned short index);
+  unsigned short _setTimeout(Callback& callback, unsigned long ms);
+  unsigned short _setInterval(Callback& callback, unsigned long ms);
 
   unsigned short m_maxArrayLength;
   unsigned short m_arrayLength = 0;
   m_TimerInfo *m_callsArray;
   unsigned short m_availableIndicesLength;
   unsigned short *m_availableIndices;
-  void m_cancelEntry(unsigned short index);
-  unsigned short _setTimeout(Callback& callback, unsigned long ms);
-  unsigned short _setInterval(Callback& callback, unsigned long ms);
 
 public:
   AsyncTimer(unsigned short arrayLength = 10) {
@@ -125,16 +125,20 @@ public:
     for (unsigned short i = 0; i < m_availableIndicesLength; i++)
       m_availableIndices[i] = i;
   }
+
   ~AsyncTimer() {
     delete[] m_callsArray;
     delete[] m_availableIndices;
   }
+
   [[deprecated("Not needed anymore, will be removed in future versions")]] void
   setup();
+
   unsigned short setTimeout(Callback::FuncPtr func_ptr, unsigned long ms) {
     Callback func_ptr_cb(func_ptr);
     return _setTimeout(func_ptr_cb, ms);
   };
+
   template <typename T>
   unsigned short setTimeout(T lambda, unsigned long ms) {
     Callback lambda_cb(lambda);
@@ -143,12 +147,13 @@ public:
 
   unsigned short setInterval(Callback::FuncPtr func_ptr, unsigned long ms) {
     Callback func_ptr_cb(func_ptr);
-    _setInterval(func_ptr_cb, ms);
+    return _setInterval(func_ptr_cb, ms);
   };
+
   template <typename T>
   unsigned short setInterval(T lambda, unsigned long ms) {
     Callback lambda_cb(lambda);
-    _setInterval(lambda_cb, ms);
+    return _setInterval(lambda_cb, ms);
   };
 
   unsigned long getRemaining(unsigned short id);

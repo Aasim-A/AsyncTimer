@@ -14,7 +14,7 @@ void setup() {
   // t.cancel(timeoutId);
 
   // Or cancel using another timeout after 3 seconds:
-  t.setTimeout([]() { t.cancel(timeoutId); }, 3000);
+  t.setTimeout([=]() { t.cancel(timeoutId); }, 3000);
 }
 
 void loop() { t.handle(); }

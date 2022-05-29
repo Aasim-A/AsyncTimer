@@ -11,7 +11,7 @@ void setup() {
   unsigned short intervalId = t.setInterval(
       []() { digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN)); }, 1000);
 
-  t.setTimeout([]() { t.cancel(intervalId); }, 10000);
+  t.setTimeout([=]() { t.cancel(intervalId); }, 10000);
 }
 
 void loop() { t.handle(); }
