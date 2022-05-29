@@ -1,6 +1,6 @@
 {
   "name": "AsyncTimer",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "JavaScript-like async timing functions (setTimeout, setInterval).",
   "keywords": [
     "settimeout",
@@ -16,7 +16,7 @@
     "esp8266",
     "arduino",
     "uno",
-    "Seeeduino",
+    "seeeduino",
     "javascript"
   ],
   "repository":

@@ -54,7 +54,7 @@ unsigned long AsyncTimer::getRemaining(unsigned short id) {
       unsigned long tsDelay =
           m_callsArray[i].timestamp + m_callsArray[i].delayByMs;
       // now can be bigger than timestamp + delayByMs because the code so far
-      // has beeen executing synchronously
+      // has been executing synchronously
       if (now < tsDelay)
         return tsDelay - now;
       break;
