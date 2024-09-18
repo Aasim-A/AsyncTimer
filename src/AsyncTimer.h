@@ -29,22 +29,18 @@ class AsyncTimer {
 private:
   class Callback {
   public:
-    using FuncPtr = void(*)();
+    using FuncPtr = void (*)();
 
     Callback() = default;
-    Callback(const Callback&) = delete;
+    Callback(const Callback &) = delete;
 
-    Callback(FuncPtr funcPtr) :
-        m_isLambda(false), m_funcPtr(funcPtr) {}
+    Callback(FuncPtr funcPtr) : m_isLambda(false), m_funcPtr(funcPtr) {}
 
-    template<typename T>
-    Callback(T lambda) : m_isLambda(true) {
+    template <typename T> Callback(T lambda) : m_isLambda(true) {
       m_lambda.data = new T(lambda);
-      m_lambda.execFunc = [](void *data) {
-        (*reinterpret_cast<T*>(data))();
-      };
-      m_lambda.deleteFunc = [](void* data) {
-        delete reinterpret_cast<T*>(data);
+      m_lambda.execFunc = [](void *data) { (*reinterpret_cast<T *>(data))(); };
+      m_lambda.deleteFunc = [](void *data) {
+        delete reinterpret_cast<T *>(data);
       };
     }
 
@@ -61,7 +57,7 @@ private:
       return m_funcPtr();
     }
 
-    Callback& operator=(Callback& other) {
+    Callback &operator=(Callback &other) {
       if (m_isLambda && m_lambda.data) {
         m_lambda.deleteFunc(m_lambda.data);
       }
@@ -76,11 +72,11 @@ private:
     }
 
   private:
-    using LambdaExecFunc = void(*)(void*);
-    using LambdaDeleteFunc = void(*)(void*);
+    using LambdaExecFunc = void (*)(void *);
+    using LambdaDeleteFunc = void (*)(void *);
 
     struct LambdaStore {
-      void* data;
+      void *data;
       LambdaExecFunc execFunc;
       LambdaDeleteFunc deleteFunc;
     };
@@ -104,11 +100,11 @@ private:
   };
 
   unsigned short m_generateId();
-  unsigned short m_newTimerInfo(Callback& callback, unsigned long ms,
+  unsigned short m_newTimerInfo(Callback &callback, unsigned long ms,
                                 bool indefinite);
   void m_cancelEntry(unsigned short index);
-  unsigned short _setTimeout(Callback& callback, unsigned long ms);
-  unsigned short _setInterval(Callback& callback, unsigned long ms);
+  unsigned short _setTimeout(Callback &callback, unsigned long ms);
+  unsigned short _setInterval(Callback &callback, unsigned long ms);
 
   unsigned short m_maxArrayLength;
   unsigned short m_arrayLength = 0;
@@ -139,8 +135,7 @@ public:
     return _setTimeout(func_ptr_cb, ms);
   };
 
-  template <typename T>
-  unsigned short setTimeout(T lambda, unsigned long ms) {
+  template <typename T> unsigned short setTimeout(T lambda, unsigned long ms) {
     Callback lambda_cb(lambda);
     return _setTimeout(lambda_cb, ms);
   };
@@ -150,8 +145,7 @@ public:
     return _setInterval(func_ptr_cb, ms);
   };
 
-  template <typename T>
-  unsigned short setInterval(T lambda, unsigned long ms) {
+  template <typename T> unsigned short setInterval(T lambda, unsigned long ms) {
     Callback lambda_cb(lambda);
     return _setInterval(lambda_cb, ms);
   };

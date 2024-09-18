@@ -13,7 +13,7 @@ unsigned short AsyncTimer::m_generateId() {
   return id;
 }
 
-unsigned short AsyncTimer::m_newTimerInfo(Callback& callback, unsigned long ms,
+unsigned short AsyncTimer::m_newTimerInfo(Callback &callback, unsigned long ms,
                                           bool indefinite) {
   if (m_availableIndicesLength == 0 || m_arrayLength == m_maxArrayLength)
     return 0;
@@ -39,18 +39,18 @@ void AsyncTimer::m_cancelEntry(unsigned short index) {
   m_availableIndicesLength++;
 }
 
-unsigned short AsyncTimer::_setTimeout(Callback& callback, unsigned long ms) {
+unsigned short AsyncTimer::_setTimeout(Callback &callback, unsigned long ms) {
   return m_newTimerInfo(callback, ms, false);
 }
 
-unsigned short AsyncTimer::_setInterval(Callback& callback, unsigned long ms) {
+unsigned short AsyncTimer::_setInterval(Callback &callback, unsigned long ms) {
   return m_newTimerInfo(callback, ms, true);
 }
 
 unsigned long AsyncTimer::getRemaining(unsigned short id) {
   unsigned long now = millis();
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
-    if (m_callsArray[i].id == id) {
+    if (m_callsArray[i].id == id && m_callsArray[i].active) {
       unsigned long tsDelay =
           m_callsArray[i].timestamp + m_callsArray[i].delayByMs;
       // now can be bigger than timestamp + delayByMs because the code so far
@@ -60,6 +60,7 @@ unsigned long AsyncTimer::getRemaining(unsigned short id) {
       break;
     }
   }
+
   return 0;
 }
 
@@ -114,7 +115,7 @@ void AsyncTimer::handle() {
         m_callsArray[i].timestamp = timestamp;
         m_callsArray[i].callback();
       } else {
-        Callback& cb = m_callsArray[i].callback;
+        Callback &cb = m_callsArray[i].callback;
         m_cancelEntry(i);
         cb();
       }
