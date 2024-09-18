@@ -1,38 +1,36 @@
 {
-  "name": "AsyncTimer",
-  "version": "2.4.0",
-  "description": "JavaScript-like async timing functions (setTimeout, setInterval).",
-  "keywords": [
-    "settimeout",
-    "setinterval",
-    "timeout",
-    "delay",
-    "interval",
-    "timer",
-    "async",
-    "asynchronous",
-    "esp",
-    "esp32",
-    "esp8266",
-    "arduino",
-    "uno",
-    "seeeduino",
-    "javascript"
-  ],
-  "repository":
-  {
-    "type": "git",
-    "url": "https://github.com/Aasim-A/AsyncTimer.git"
-  },
-  "homepage": "https://github.com/Aasim-A/AsyncTimer",
-  "authors":
-  {
-    "name": "Aasim-A",
-    "url":   "https://github.com/Aasim-A",
-    "maintainer": true
-  },
-  "license": "MIT",
-  "frameworks": "*",
-  "platforms": "*",
-  "examples": "examples/*/*/*.ino"
+	"name": "AsyncTimer",
+	"version": "2.4.1",
+	"description": "JavaScript-like async timing functions (setTimeout, setInterval).",
+	"keywords": [
+		"settimeout",
+		"setinterval",
+		"timeout",
+		"delay",
+		"interval",
+		"timer",
+		"async",
+		"asynchronous",
+		"esp",
+		"esp32",
+		"esp8266",
+		"arduino",
+		"uno",
+		"seeeduino",
+		"javascript"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Aasim-A/AsyncTimer.git"
+	},
+	"homepage": "https://github.com/Aasim-A/AsyncTimer",
+	"authors": {
+		"name": "Aasim-A",
+		"url": "https://github.com/Aasim-A",
+		"maintainer": true
+	},
+	"license": "MIT",
+	"frameworks": "*",
+	"platforms": "*",
+	"examples": "examples/*/*/*.ino"
 }
