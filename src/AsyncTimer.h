@@ -93,6 +93,8 @@ private:
     Callback callback;
     unsigned long delayByMs;
     unsigned long timestamp;
+    // Keep postponement separate so timestamp always refers to a past millis().
+    unsigned long postponedByMs;
     bool indefinite;
     bool active;
 

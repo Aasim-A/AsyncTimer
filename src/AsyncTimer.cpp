@@ -25,6 +25,7 @@ unsigned short AsyncTimer::m_newTimerInfo(Callback &callback, unsigned long ms,
   m_callsArray[availableIndex].callback = callback;
   m_callsArray[availableIndex].delayByMs = ms;
   m_callsArray[availableIndex].timestamp = millis();
+  m_callsArray[availableIndex].postponedByMs = 0;
   m_callsArray[availableIndex].indefinite = indefinite;
   m_callsArray[availableIndex].active = true;
   m_arrayLength++;
@@ -51,12 +52,13 @@ unsigned long AsyncTimer::getRemaining(unsigned short id) {
   unsigned long now = millis();
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     if (m_callsArray[i].id == id && m_callsArray[i].active) {
-      unsigned long tsDelay =
-          m_callsArray[i].timestamp + m_callsArray[i].delayByMs;
-      // now can be bigger than timestamp + delayByMs because the code so far
-      // has been executing synchronously
-      if (now < tsDelay)
-        return tsDelay - now;
+      unsigned long elapsed = now - m_callsArray[i].timestamp;
+      if (elapsed < m_callsArray[i].postponedByMs)
+        return m_callsArray[i].postponedByMs - elapsed +
+               m_callsArray[i].delayByMs;
+      elapsed -= m_callsArray[i].postponedByMs;
+      if (elapsed < m_callsArray[i].delayByMs)
+        return m_callsArray[i].delayByMs - elapsed;
       break;
     }
   }
@@ -74,14 +76,16 @@ void AsyncTimer::changeDelay(unsigned short id, unsigned long ms) {
 void AsyncTimer::delay(unsigned short id, unsigned long ms) {
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     if (m_callsArray[i].id == id)
-      m_callsArray[i].timestamp += ms;
+      m_callsArray[i].postponedByMs += ms;
   }
 }
 
 void AsyncTimer::reset(unsigned short id) {
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
-    if (m_callsArray[i].id == id)
+    if (m_callsArray[i].id == id) {
       m_callsArray[i].timestamp = millis();
+      m_callsArray[i].postponedByMs = 0;
+    }
   }
 }
 
@@ -108,11 +112,17 @@ void AsyncTimer::handle() {
 
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     unsigned long timestamp = millis();
-    if (!m_callsArray[i].active || m_callsArray[i].timestamp > timestamp)
+    if (!m_callsArray[i].active)
       continue;
-    if (timestamp - m_callsArray[i].timestamp >= m_callsArray[i].delayByMs) {
+    // Unsigned subtraction keeps elapsed time correct when millis() wraps.
+    unsigned long elapsed = timestamp - m_callsArray[i].timestamp;
+    if (elapsed < m_callsArray[i].postponedByMs)
+      continue;
+    elapsed -= m_callsArray[i].postponedByMs;
+    if (elapsed >= m_callsArray[i].delayByMs) {
       if (m_callsArray[i].indefinite) {
         m_callsArray[i].timestamp = timestamp;
+        m_callsArray[i].postponedByMs = 0;
         m_callsArray[i].callback();
       } else {
         Callback &cb = m_callsArray[i].callback;
