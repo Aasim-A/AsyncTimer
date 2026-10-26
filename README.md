@@ -309,6 +309,19 @@ t.cancelAll(false);
 - CancelTimeout - Cancel a timeout using `cancel`.
 - DebounceUsingTimeout - Debounce button using a `delay`.
 
+# Testing on a PC
+
+The host tests run with a C++11 compiler and CMake, without an Arduino or Arduino SDK.
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release --parallel
+ctest --test-dir build -C Release --output-on-failure
+```
+
+See [tests/README.md](tests/README.md) for coverage, individual suites, sanitizers,
+and 32-bit builds.
+
 # License
 
 This library is licensed under [MIT](https://github.com/Aasim-A/AsyncTimer/blob/master/LICENSE).

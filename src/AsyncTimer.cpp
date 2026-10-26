@@ -3,14 +3,20 @@
 void AsyncTimer::setup() {}
 
 unsigned short AsyncTimer::m_generateId() {
-  unsigned short id = rand() + 1;
-
-  for (unsigned short i = 0; i < m_maxArrayLength; i++) {
-    if (m_callsArray[i].id == id)
-      return m_generateId();
+  // Called only when a slot is free, so a nonzero unused ID always exists.
+  for (;;) {
+    if (++m_nextId == 0)
+      ++m_nextId;
+    bool inUse = false;
+    for (unsigned short i = 0; i < m_maxArrayLength; i++) {
+      if (m_callsArray[i].active && m_callsArray[i].id == m_nextId) {
+        inUse = true;
+        break;
+      }
+    }
+    if (!inUse)
+      return m_nextId;
   }
-
-  return id;
 }
 
 unsigned short AsyncTimer::m_newTimerInfo(Callback &callback, unsigned long ms,
@@ -35,6 +41,7 @@ unsigned short AsyncTimer::m_newTimerInfo(Callback &callback, unsigned long ms,
 
 void AsyncTimer::m_cancelEntry(unsigned short index) {
   m_callsArray[index].active = false;
+  m_callsArray[index].callback.clear();
   m_arrayLength--;
   m_availableIndices[m_availableIndicesLength] = index;
   m_availableIndicesLength++;
@@ -51,7 +58,7 @@ unsigned short AsyncTimer::_setInterval(Callback &callback, unsigned long ms) {
 unsigned long AsyncTimer::getRemaining(unsigned short id) {
   unsigned long now = millis();
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
-    if (m_callsArray[i].id == id && m_callsArray[i].active) {
+    if (m_callsArray[i].active && m_callsArray[i].id == id) {
       unsigned long elapsed = now - m_callsArray[i].timestamp;
       if (elapsed < m_callsArray[i].postponedByMs)
         return m_callsArray[i].postponedByMs - elapsed +
@@ -68,21 +75,21 @@ unsigned long AsyncTimer::getRemaining(unsigned short id) {
 
 void AsyncTimer::changeDelay(unsigned short id, unsigned long ms) {
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
-    if (m_callsArray[i].id == id)
+    if (m_callsArray[i].active && m_callsArray[i].id == id)
       m_callsArray[i].delayByMs = ms;
   }
 }
 
 void AsyncTimer::delay(unsigned short id, unsigned long ms) {
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
-    if (m_callsArray[i].id == id)
+    if (m_callsArray[i].active && m_callsArray[i].id == id)
       m_callsArray[i].postponedByMs += ms;
   }
 }
 
 void AsyncTimer::reset(unsigned short id) {
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
-    if (m_callsArray[i].id == id) {
+    if (m_callsArray[i].active && m_callsArray[i].id == id) {
       m_callsArray[i].timestamp = millis();
       m_callsArray[i].postponedByMs = 0;
     }
@@ -91,17 +98,15 @@ void AsyncTimer::reset(unsigned short id) {
 
 void AsyncTimer::cancel(unsigned short id) {
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
-    if (m_callsArray[i].id == id && m_callsArray[i].active)
+    if (m_callsArray[i].active && m_callsArray[i].id == id)
       m_cancelEntry(i);
   }
 }
 
 void AsyncTimer::cancelAll(bool includeIntervals) {
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
-    if (!includeIntervals) {
-      if (!m_callsArray[i].indefinite)
-        m_cancelEntry(i);
-    } else
+    if (m_callsArray[i].active &&
+        (includeIntervals || !m_callsArray[i].indefinite))
       m_cancelEntry(i);
   }
 }
@@ -112,7 +117,7 @@ void AsyncTimer::handle() {
 
   for (unsigned short i = 0; i < m_maxArrayLength; i++) {
     unsigned long timestamp = millis();
-    if (!m_callsArray[i].active)
+    if (!m_callsArray[i].active || m_callsArray[i].callback.empty())
       continue;
     // Unsigned subtraction keeps elapsed time correct when millis() wraps.
     unsigned long elapsed = timestamp - m_callsArray[i].timestamp;
@@ -120,15 +125,28 @@ void AsyncTimer::handle() {
       continue;
     elapsed -= m_callsArray[i].postponedByMs;
     if (elapsed >= m_callsArray[i].delayByMs) {
+      // A callback may cancel itself or reuse its slot. Keep its captures alive
+      // until it returns, and leave the slot empty during nested handle() calls.
+      Callback callback;
+      callback = m_callsArray[i].callback;
+      struct RestoreCallback {
+        m_TimerInfo &entry;
+        Callback &callback;
+        unsigned short id;
+
+        ~RestoreCallback() {
+          if (entry.active && entry.id == id && entry.callback.empty())
+            entry.callback = callback;
+        }
+      } restore{m_callsArray[i], callback, m_callsArray[i].id};
+
       if (m_callsArray[i].indefinite) {
         m_callsArray[i].timestamp = timestamp;
         m_callsArray[i].postponedByMs = 0;
-        m_callsArray[i].callback();
       } else {
-        Callback &cb = m_callsArray[i].callback;
         m_cancelEntry(i);
-        cb();
       }
+      callback();
     }
   }
 }

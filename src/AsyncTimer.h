@@ -31,7 +31,7 @@ private:
   public:
     using FuncPtr = void (*)();
 
-    Callback() = default;
+    Callback() : m_funcPtr(nullptr) {}
     Callback(const Callback &) = delete;
 
     Callback(FuncPtr funcPtr) : m_isLambda(false), m_funcPtr(funcPtr) {}
@@ -44,11 +44,17 @@ private:
       };
     }
 
-    ~Callback() {
+    ~Callback() { clear(); }
+
+    void clear() {
       if (m_isLambda && m_lambda.data) {
         m_lambda.deleteFunc(m_lambda.data);
       }
+      m_isLambda = false;
+      m_funcPtr = nullptr;
     }
+
+    bool empty() const { return m_isLambda ? !m_lambda.data : !m_funcPtr; }
 
     void operator()() {
       if (m_isLambda) {
@@ -58,16 +64,17 @@ private:
     }
 
     Callback &operator=(Callback &other) {
-      if (m_isLambda && m_lambda.data) {
-        m_lambda.deleteFunc(m_lambda.data);
-      }
+      if (this == &other)
+        return *this;
+      clear();
       m_isLambda = other.m_isLambda;
       if (m_isLambda) {
         m_lambda = other.m_lambda;
-        other.m_lambda.data = nullptr;
       } else {
         m_funcPtr = other.m_funcPtr;
       }
+      other.m_isLambda = false;
+      other.m_funcPtr = nullptr;
       return *this;
     }
 
@@ -98,7 +105,9 @@ private:
     bool indefinite;
     bool active;
 
-    m_TimerInfo() : active(false) {}
+    m_TimerInfo()
+        : id(0), delayByMs(0), timestamp(0), postponedByMs(0), indefinite(false),
+          active(false) {}
   };
 
   unsigned short m_generateId();
@@ -110,6 +119,7 @@ private:
 
   unsigned short m_maxArrayLength;
   unsigned short m_arrayLength = 0;
+  unsigned short m_nextId = 0;
   m_TimerInfo *m_callsArray;
   unsigned short m_availableIndicesLength;
   unsigned short *m_availableIndices;
@@ -120,7 +130,7 @@ public:
     m_callsArray = new m_TimerInfo[arrayLength];
     m_availableIndicesLength = arrayLength;
     m_availableIndices = new unsigned short[arrayLength];
-    for (unsigned short i = 0; i < m_availableIndicesLength; i++)
+    for (unsigned short i = 0; i < arrayLength; i++)
       m_availableIndices[i] = i;
   }
 
