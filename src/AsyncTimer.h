@@ -38,7 +38,9 @@ private:
 
     template <typename T> Callback(T lambda) : m_isLambda(true) {
       m_lambda.data = new T(lambda);
-      m_lambda.execFunc = [](void *data) { (*reinterpret_cast<T *>(data))(); };
+      m_lambda.execFunc = [](void *data, unsigned short id) {
+        invoke(*reinterpret_cast<T *>(data), id, 0);
+      };
       m_lambda.deleteFunc = [](void *data) {
         delete reinterpret_cast<T *>(data);
       };
@@ -56,9 +58,9 @@ private:
 
     bool empty() const { return m_isLambda ? !m_lambda.data : !m_funcPtr; }
 
-    void operator()() {
+    void operator()(unsigned short id) {
       if (m_isLambda) {
-        return m_lambda.execFunc(m_lambda.data);
+        return m_lambda.execFunc(m_lambda.data, id);
       }
       return m_funcPtr();
     }
@@ -79,7 +81,20 @@ private:
     }
 
   private:
-    using LambdaExecFunc = void (*)(void *);
+    // Prefer the existing no-argument call when both signatures are supported.
+    template <typename T>
+    static auto invoke(T &callback, unsigned short, int)
+        -> decltype(callback(), void()) {
+      callback();
+    }
+
+    template <typename T>
+    static auto invoke(T &callback, unsigned short id, long)
+        -> decltype(callback(id), void()) {
+      callback(id);
+    }
+
+    using LambdaExecFunc = void (*)(void *, unsigned short);
     using LambdaDeleteFunc = void (*)(void *);
 
     struct LambdaStore {
@@ -147,7 +162,10 @@ public:
     return _setTimeout(func_ptr_cb, ms);
   };
 
-  template <typename T> unsigned short setTimeout(T lambda, unsigned long ms) {
+  // Timeouts accept only callbacks callable without arguments.
+  template <typename T>
+  auto setTimeout(T lambda, unsigned long ms)
+      -> decltype(lambda(), static_cast<unsigned short>(0)) {
     Callback lambda_cb(lambda);
     return _setTimeout(lambda_cb, ms);
   };

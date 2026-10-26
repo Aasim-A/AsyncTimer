@@ -146,7 +146,7 @@ void AsyncTimer::handle() {
       } else {
         m_cancelEntry(i);
       }
-      callback();
+      callback(restore.id);
     }
   }
 }

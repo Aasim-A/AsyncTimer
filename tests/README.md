@@ -13,7 +13,7 @@ ctest --test-dir build -C Release --output-on-failure
 ```
 
 These commands also work with a Visual Studio developer terminal on Windows.
-Checks remain enabled in Release builds. CTest runs 11 executables; each reports
+Checks remain enabled in Release builds. CTest runs 13 executables; each reports
 its individual cases on failure (or when CTest is run with `--verbose`).
 
 To run one suite or one case:
@@ -38,11 +38,15 @@ With Visual Studio, the executable is under `build/tests/Release/` and ends in
 - Callbacks: function pointers, lambdas, mutable captures, callable objects,
   capture destruction, registration failure, scheduling/cancelling inside a
   callback, nested `handle()`, and exception cleanup on hosts with exceptions.
+- Callback IDs: intervals receiving the registration ID directly, self-cancellation after
+  the registration scope ends, nested callbacks, slot reuse, and compatibility
+  with existing zero-argument/default-argument callables. Compile-time checks
+  verify that `setTimeout` rejects callbacks requiring an ID argument.
 - Rollover: timeout/interval boundaries, delayed/reset timers, large delays,
   deadlines exactly at zero, and multiple clock wraps.
 - Model tests: 75,000 seeded operations compared with a separate model using
   absolute deadlines. A failure reports the seed and operation number.
-- All five example sketches: the actual `.ino` files are included and exercised
+- All six example sketches: the actual `.ino` files are included and exercised
   with simulated GPIO and serial output.
 
 The clock advances only when a test asks it to. Rollover tests use `ULONG_MAX`,

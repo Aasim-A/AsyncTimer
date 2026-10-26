@@ -127,6 +127,48 @@ t.setInterval(functionToCall, 2000);
 // "Hello world!" will be printed to the Serial every 2 seconds
 ```
 
+## Accessing the interval ID inside its callback
+
+`setInterval` accepts a callback with an `unsigned short` parameter. AsyncTimer
+supplies the same ID returned by the registration call,
+so the callback can cancel or modify its own timer without capturing an ID variable.
+Existing interval callbacks that take no arguments continue to work.
+`setTimeout` callbacks take no arguments; the ID parameter is only for intervals.
+
+```c++
+AsyncTimer t;
+
+void setup() {
+  Serial.begin(9600);
+  unsigned int remaining = 5;
+  t.setInterval([remaining](unsigned short id) mutable {
+    Serial.println("Tick");
+    if (--remaining == 0) {
+      t.cancel(id);
+      return;
+    }
+  }, 1000);
+}
+
+void loop() { t.handle(); }
+```
+
+This prints five messages and cancels only that interval. The captured counter
+belongs to the callback, so it remains valid after `setup()` returns. Functions
+and callable objects with an ID parameter are also supported. If a callable
+supports both zero arguments and an ID (for example, through a default argument),
+the zero-argument call is preserved; omit the default to receive the timer ID.
+
+Do not capture a local ID by value in its own initializer, such as
+`unsigned short id = t.setInterval([id]() { /* ... */ }, 1000)`: the ID has not been assigned
+yet. Capturing it by reference is valid only while that variable remains alive.
+The callback argument avoids both problems.
+
+`cancel(id)` prevents future invocations; it does not interrupt the callback
+currently running. Use `return` to stop executing that callback. One-shot timeouts
+are already removed before their callback runs, so cancelling their own ID has
+no effect.
+
 ## getRemaining(intervalOrTimeoutId)
 
 Gets the number of milliseconds remaining in a timer. Returns `0` if the timer is not found.
@@ -306,6 +348,7 @@ t.cancelAll(false);
 - BlinkUsingInterval - Blink led using `setInterval`.
 - SerialMsgUsingTimeout - Send a message to the serial monitor using `setTimeout` 10 seconds after booting.
 - CancelInterval - Cancel an interval using `cancel`.
+- CancelIntervalFromCallback - Cancel an interval using the ID passed to its callback.
 - CancelTimeout - Cancel a timeout using `cancel`.
 - DebounceUsingTimeout - Debounce button using a `delay`.
 
